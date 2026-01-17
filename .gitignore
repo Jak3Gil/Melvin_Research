@@ -1,0 +1,6 @@
+.pio
+.vscode
+*.pyc
+__pycache__
+camera_images/
+robstride_repos/

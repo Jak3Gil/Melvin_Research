@@ -1,0 +1,70 @@
+MOTOR STUDIO COMMAND CAPTURE - AUTOMATED INSTRUCTIONS
+Generated: 2026-01-13 18:44:15
+
+AVAILABLE COM PORTS:
+  1. COM5 - AVAILABLE
+  2. COM1 - LOCKED (probably Motor Studio)
+  3. COM7 - LOCKED (probably Motor Studio)
+  4. COM4 - AVAILABLE
+
+RECOMMENDED PORT: COM5
+
+AUTOMATED CAPTURE INSTRUCTIONS:
+================================
+
+Since Windows locks COM ports, you need to use serial port monitor software.
+
+STEP 1: Download Serial Port Monitor
+  URL: https://free-serial-port-monitor.com/
+  (Free trial available)
+
+STEP 2: Install and Run Serial Port Monitor
+  - Install the software
+  - Launch it
+
+STEP 3: Start Monitoring
+  - Port: COM5
+  - Baud: 921600
+  - Data bits: 8
+  - Stop bits: 1
+  - Parity: None
+
+STEP 4: Open Motor Studio
+  - Launch motor_tool.exe
+  - Connect to the same port
+  - Motor Studio and monitor can both use the port!
+
+STEP 5: Perform Actions
+  - Scan for motors
+  - Enable a motor
+  - Move a motor
+  - Each action generates commands
+
+STEP 6: Export Captured Data
+  - Select all captured commands
+  - Export as CSV format
+  - Save as: motor_studio_capture.csv
+
+STEP 7: Analyze Commands
+  Run: python analyze_captured_commands.py motor_studio_capture.csv
+
+ALTERNATIVE: Direct Capture (if Motor Studio is NOT running)
+  Run: python capture_motor_studio_commands.py
+  (Will only work if port is not locked)
+
+NEXT STEPS:
+===========
+
+1. If Motor Studio is running:
+   - Use Serial Port Monitor (see above)
+   - This is the only reliable method
+
+2. If Motor Studio is NOT running:
+   - Port should be available
+   - But Motor Studio needs to be running to send commands!
+   - So this doesn't help much...
+
+3. Best Solution:
+   - Use Serial Port Monitor software
+   - It works alongside Motor Studio
+   - No port locking issues

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jetson USB Cameras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        .cameras {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .camera-box {
+            flex: 1;
+            min-width: 300px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .camera-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+        .camera-stream {
+            width: 100%;
+            height: auto;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            background: #000;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .status.connected {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.disconnected {
+            background: #f44336;
+            color: white;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .info {
+            text-align: center;
+            margin: 20px 0;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jetson USB Cameras Viewer</h1>
+        <div class="info">
+            <p>Streaming from: 192.168.1.119</p>
+            <p>Camera 1: /dev/video0 | Camera 2: /dev/video2</p>
+        </div>
+        
+        <div class="controls">
+            <button onclick="startStreams()">Start Streams</button>
+            <button onclick="stopStreams()">Stop Streams</button>
+            <button onclick="captureSnapshot()">Capture Snapshots</button>
+        </div>
+
+        <div class="cameras">
+            <div class="camera-box">
+                <div class="camera-title">Camera 1 (/dev/video0)</div>
+                <img id="cam1" class="camera-stream" src="http://192.168.1.119:8080/" 
+                     alt="Camera 1 Stream" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><text x=%2210%22 y=%2250%22 fill=%22white%22>Camera 1 Not Available</text></svg>';">
+                <div id="status1" class="status disconnected">Disconnected</div>
+            </div>
+            
+            <div class="camera-box">
+                <div class="camera-title">Camera 2 (/dev/video2)</div>
+                <img id="cam2" class="camera-stream" src="http://192.168.1.119:8081/" 
+                     alt="Camera 2 Stream" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><text x=%2210%22 y=%2250%22 fill=%22white%22>Camera 2 Not Available</text></svg>';">
+                <div id="status2" class="status disconnected">Disconnected</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cam1Interval, cam2Interval;
+        
+        function updateStream(camId, port, statusId) {
+            const img = document.getElementById(camId);
+            const status = document.getElementById(statusId);
+            const url = `http://192.168.1.119:${port}/?${Date.now()}`;
+            
+            img.onload = function() {
+                status.textContent = 'Connected';
+                status.className = 'status connected';
+            };
+            
+            img.onerror = function() {
+                status.textContent = 'Disconnected';
+                status.className = 'status disconnected';
+            };
+            
+            img.src = url;
+        }
+        
+        function startStreams() {
+            // Update every 100ms for smooth stream
+            cam1Interval = setInterval(() => updateStream('cam1', 8080, 'status1'), 100);
+            cam2Interval = setInterval(() => updateStream('cam2', 8081, 'status2'), 100);
+            alert('Streams started! Make sure the streaming server is running on the Jetson.');
+        }
+        
+        function stopStreams() {
+            clearInterval(cam1Interval);
+            clearInterval(cam2Interval);
+            document.getElementById('cam1').src = '';
+            document.getElementById('cam2').src = '';
+            document.getElementById('status1').textContent = 'Stopped';
+            document.getElementById('status1').className = 'status disconnected';
+            document.getElementById('status2').textContent = 'Stopped';
+            document.getElementById('status2').className = 'status disconnected';
+        }
+        
+        function captureSnapshot() {
+            // Open snapshot URLs in new tabs
+            window.open('http://192.168.1.119:8080/', '_blank');
+            window.open('http://192.168.1.119:8081/', '_blank');
+        }
+        
+        // Auto-start streams on page load
+        window.onload = function() {
+            setTimeout(startStreams, 1000);
+        };
+    </script>
+</body>
+</html>
+
